@@ -3,7 +3,9 @@
 """ p2p-streams
     2014 enen92 fightnight"""
 
-import xbmc,xbmcaddon,xbmcgui,xbmcplugin,urllib,urllib2,os,re,sys,datetime,time,subprocess,xbmcvfs,livestreams,socket,pytz
+import xbmc,xbmcaddon,xbmcgui,xbmcplugin,urllib,urllib2,os,re,sys,datetime,time,subprocess,xbmcvfs,livestreams,socket
+from dateutil import tz
+
 
 ####################################################### CONSTANTES #####################################################
 
@@ -821,7 +823,7 @@ def autoconf():
 			try:
 				if re.search(os.uname()[1],"openelec",re.IGNORECASE): acestream_rpi = "http://p2p-strm.googlecode.com/svn/trunk/openelec-for-userdata.tar.gz"
 				elif re.search(os.uname()[1],"raspbmc",re.IGNORECASE): acestream_rpi = "http://p2p-strm.googlecode.com/svn/trunk/raspbmc-for-userdata.tar.gz"
-				elif re.search(os.uname()[1],"xbian",re.IGNORECASE): acestream_rpi = "http://p2p-strm.googlecode.com/svn/trunk/xbian-userdata.tar.gz"
+				elif os.path.isfile("/etc/xbian_version"): acestream_rpi = "http://p2p-strm.googlecode.com/svn/trunk/xbian-userdata.tar.gz"
 				else:
 					mensagemok(traducao(40000),"Sorry could not detect your OS.","Select it from the next list")
 					OS_list = ["OpenELEC","Raspbmc","Xbian","Pipplware"]
@@ -855,6 +857,24 @@ def autoconf():
 
 			settings.setSetting('autoconfig',value='false')
                 elif os.uname()[4] == "armv7l":
+                        if os.path.isfile("/etc/xbian_version"):
+				SPSC_KIT = os.path.join(addonpath,sopcast_raspberry.split("/")[-1])
+				download_tools().Downloader(sopcast_raspberry,SPSC_KIT,traducao(40025),traducao(40000))
+				if tarfile.is_tarfile(SPSC_KIT):
+					path_libraries = os.path.join(pastaperfil,"sopcast")
+					download_tools().extract(SPSC_KIT,path_libraries)
+					xbmc.sleep(500)
+					download_tools().remove(SPSC_KIT)
+				acestream_mxlinux = "http://ivka57.dyndns-ip.com/others/aceengine-armv7l-xbian.tar.gz"
+				SPSC_KIT = os.path.join(addonpath,acestream_mxlinux.split("/")[-1])
+				download_tools().Downloader(acestream_mxlinux,SPSC_KIT,traducao(40026),traducao(40000))
+				if tarfile.is_tarfile(SPSC_KIT):
+					path_libraries = os.path.join(pastaperfil,"acestream")
+					download_tools().extract(SPSC_KIT,path_libraries)
+					xbmc.sleep(500)
+					download_tools().remove(SPSC_KIT)
+				settings.setSetting('autoconfig',value='false')				
+				return
                 	mensagemok(traducao(40000),traducao(40109),traducao(40110))
                 	OS_list = ["MXLinux"]
                 	choose=xbmcgui.Dialog().select('Select your OS',OS_list)
@@ -864,8 +884,8 @@ def autoconf():
 					acestream_installed = False
 					sopcast_installed = False
                 			print "MXLinux"
-                			SPSC_KIT = os.path.join(addonpath,sopcast_raspberry.split("/")[-1])
-                			download_tools().Downloader(sopcast_raspberry,SPSC_KIT,traducao(40025),traducao(40000))
+					SPSC_KIT = os.path.join(addonpath,sopcast_raspberry.split("/")[-1])
+					download_tools().Downloader(sopcast_raspberry,SPSC_KIT,traducao(40025),traducao(40000))
 					if tarfile.is_tarfile(SPSC_KIT):
 						path_libraries = os.path.join(pastaperfil,"sopcast")
 						download_tools().extract(SPSC_KIT,path_libraries)
@@ -875,7 +895,7 @@ def autoconf():
 					acestream_mxlinux = "http://p2p-strm.googlecode.com/svn/trunk/aceengine-armv7l-mxlinux.tar.gz"
 					SPSC_KIT = os.path.join(addonpath,acestream_mxlinux.split("/")[-1])
 					download_tools().Downloader(acestream_mxlinux,SPSC_KIT,traducao(40026),traducao(40000))
-        				if tarfile.is_tarfile(SPSC_KIT):
+					if tarfile.is_tarfile(SPSC_KIT):
 						path_libraries = os.path.join(pastaperfil,"acestream")
 						download_tools().extract(SPSC_KIT,path_libraries)
 						xbmc.sleep(500)
